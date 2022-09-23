@@ -1,0 +1,242 @@
+# This file will be used to generate all of the schema-*.json files in a bundle
+schema: draft-07
+name: "aws-dynamodb-table"
+description: "Dynamodb table with optional data stream"
+source_url: github.com/massdriver-cloud/aws-dynamodb-table
+access: "public"
+type: "bundle"
+
+ValidIndexDataTypes: &valid_index_data_types
+  oneOf:
+    - title: String
+      const: "S"
+    - title: Number
+      const: "N"
+    - title: Binary
+      const: "B"
+
+PartitionKeyProperties: &partition_key_properties
+  partition_key:
+    type: string
+    title: "Partition Key"
+  partition_key_type:
+    type: string
+    title: "Partition Key Type"
+    <<: *valid_index_data_types
+
+SortKeyProperties: &sort_key_properties
+  sort_key:
+    type: string
+    title: "Sort Key"
+  sort_key_type:
+    type: string
+    title: "Sort Key Type"
+    <<: *valid_index_data_types
+
+# schema-params.json
+# JSON Schema sans-fields above
+params:
+  examples:
+    - __name: Free Tier
+      region: us-west-2
+      capacity:
+        billing_mode: "PROVISIONED"
+        read_capacity: 25
+        write_capacity: 25
+      primary_index:
+        type: simple
+        partition_key: ID
+        partition_key_type: S
+      ttl:
+        enabled: true
+    - __name: Pay Per Request
+      region: us-west-2
+      capacity:
+        billing_mode: "PAY_PER_REQUEST"
+      primary_index:
+        type: simple
+        partition_key: ID
+        partition_key_type: S
+    - __name: Compound Index
+      region: us-west-2
+      capacity:
+        billing_mode: "PAY_PER_REQUEST"
+      primary_index:
+        type: compound
+        partition_key: ID
+        partition_key_type: S
+        sort_key: Date
+        sort_key_type: S
+    - __name: With TTL
+      region: us-west-2
+      capacity:
+        billing_mode: "PAY_PER_REQUEST"
+      primary_index:
+        type: compound
+        partition_key: ID
+        partition_key_type: S
+        sort_key: Date
+        sort_key_type: S
+    - __name: With Streams
+      region: us-west-2
+      capacity:
+        billing_mode: "PAY_PER_REQUEST"
+      primary_index:
+        type: compound
+        partition_key: ID
+        partition_key_type: S
+        sort_key: Date
+        sort_key_type: S
+      stream:
+        enabled: true
+        view_type: "KEYS_ONLY"
+
+  required:
+    - region
+  properties:
+    region:
+      title: "Region"
+      $md.immutable: true
+      $ref:  https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
+    capacity:
+      type: object
+      title: "Capacity"
+      dependencies:
+        billing_mode:
+          oneOf:
+            - properties:
+                billing_mode:
+                  const: "PROVISIONED"
+                read_capacity:
+                  type: integer
+                  title: "Read Capacity"
+                  minimum: 1
+                  maximum: 3000
+                write_capacity:
+                  type: string
+                  title: "Write Capacity"
+                  minimum: 1
+                  maximum: 1000
+              required:
+                - read_capacity
+                - write_capacity
+            - properties:
+                billing_mode:
+                  const: "PAY_PER_REQUEST"
+      properties:
+        billing_mode:
+          type: string
+          title: "Billing Mode"
+          default: PAY_PER_REQUEST
+          enum:
+            - PAY_PER_REQUEST
+            - PROVISIONED
+    primary_index:
+      type: object
+      title: "Primary Index"
+      dependencies:
+        primary_index_type:
+          oneOf:
+            - properties:
+                primary_index_type:
+                  const: "compound"
+                <<: [ *partition_key_properties, *sort_key_properties]
+              required:
+                - partition_key
+                - partition_key_type
+                - sort_key
+                - sort_key_type
+            - properties:
+                primary_index_type:
+                  const: "simple"
+                <<: *partition_key_properties
+              required:
+                - partition_key
+                - partition_key_type
+      properties:
+        primary_index_type:
+          type: string
+          title: "Type"
+          default: simple
+          enum:
+            - simple
+            - compound
+    stream:
+      type: object
+      title: "DynamoDB Streams"
+      description: "Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service."
+      dependencies:
+        enabled:
+          oneOf:
+            - properties:
+                enabled:
+                  const: true
+                view_type:
+                  type: string
+                  default: NEW_IMAGE
+                  enum:
+                    - KEYS_ONLY
+                    - NEW_IMAGE
+                    - OLD_IMAGE
+                    - NEW_AND_OLD_IMAGES
+              required:
+                - view_type
+            - properties:
+                enabled:
+                  const: false
+      properties:
+        enabled:
+          type: boolean
+          default: false
+          title: "Enabled?"
+    ttl:
+      type: object
+      title: "TTL"
+      description: "Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'"
+      properties:
+        enabled:
+          type: boolean
+          title: "Enabled?"
+          default: false
+
+
+# schema-connections.json
+# Named list of input connections (artifacts) (map[name]artifact)
+
+connections:
+  required:
+    - authentication
+  properties:
+    authentication:
+      $ref: massdriver/aws-iam-role
+
+# schema-artifacts.json
+# Named list of output artifacts  (map[name]artifact)
+artifacts:
+  properties: {}
+  # required:
+  #   - network
+  # properties:
+  #   network:
+  #     $ref: massdriver/aws-vpc
+
+# schema-ui.json
+# List of form customizations for params-schema
+ui:
+  ui:order:
+    - region
+    - capacity
+    - primary_index
+    - ttl
+    - stream
+  region:
+    ui:field: supportedCloudLocationsDropdown
+    cloudService: aws
+  ## set top level ui:wiget
+  # secret_key:
+  #    ui:widget: "password"
+  ## Set key in an array of objects
+  # secrets:
+  #   items:
+  #     mdKeyId:
+  #       ui:widget: "hidden"
