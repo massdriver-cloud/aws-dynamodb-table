@@ -4,9 +4,10 @@ locals {
   range_key        = var.primary_index.type == "compound" ? var.primary_index.sort_key : null
   sort_key         = var.primary_index.type == "compound" ? [1] : []
   stream_view_type = var.stream.enabled ? var.stream.view_type : null
+  name             = var.md_metadata.name_prefix
 }
 resource "aws_dynamodb_table" "main" {
-  name             = var.md_metadata.name_prefix
+  name             = local.name
   billing_mode     = var.capacity.billing_mode
   read_capacity    = local.read_capacity
   write_capacity   = local.write_capacity
