@@ -1,7 +1,6 @@
 resource "massdriver_artifact" "table" {
   field                = "table"
   provider_resource_id = aws_dynamodb_table.main.arn
-  type                 = "aws-dynamodb-table"
   name                 = "DynamoDb table: ${local.name}"
   artifact = jsonencode(
     {
@@ -33,7 +32,6 @@ resource "massdriver_artifact" "stream" {
   count                = var.stream.enabled ? 1 : 0
   field                = "stream"
   provider_resource_id = aws_dynamodb_table.main.stream_arn
-  type                 = "aws-dynamodb-stream"
   name                 = "DynamoDb stream: ${local.name}"
   artifact = jsonencode(
     {
