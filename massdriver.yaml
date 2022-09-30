@@ -106,7 +106,7 @@ params:
           oneOf:
             - properties:
                 billing_mode:
-                  const: "PROVISIONED"
+                  const: PROVISIONED
                 read_capacity:
                   type: integer
                   title: "Read Capacity"
@@ -122,7 +122,7 @@ params:
                 - write_capacity
             - properties:
                 billing_mode:
-                  const: "PAY_PER_REQUEST"
+                  const: PAY_PER_REQUEST
       properties:
         billing_mode:
           type: string
