@@ -19,18 +19,22 @@ PartitionKeyProperties: &partition_key_properties
   partition_key:
     type: string
     title: "Partition Key"
+    $md.immutable: true
   partition_key_type:
     type: string
     title: "Partition Key Type"
+    $md.immutable: true
     <<: *valid_index_data_types
 
 SortKeyProperties: &sort_key_properties
   sort_key:
     type: string
     title: "Sort Key"
+    $md.immutable: true
   sort_key_type:
     type: string
     title: "Sort Key Type"
+    $md.immutable: true
     <<: *valid_index_data_types
 
 # schema-params.json
@@ -157,6 +161,7 @@ params:
           type: string
           title: "Type"
           default: simple
+          $md.immutable: true
           enum:
             - simple
             - compound
@@ -201,7 +206,6 @@ params:
 
 # schema-connections.json
 # Named list of input connections (artifacts) (map[name]artifact)
-
 connections:
   required:
     - authentication
@@ -232,11 +236,3 @@ ui:
   region:
     ui:field: supportedCloudLocationsDropdown
     cloudService: aws
-  ## set top level ui:wiget
-  # secret_key:
-  #    ui:widget: "password"
-  ## Set key in an array of objects
-  # secrets:
-  #   items:
-  #     mdKeyId:
-  #       ui:widget: "hidden"
