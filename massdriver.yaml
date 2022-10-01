@@ -40,7 +40,7 @@ params:
     - __name: Free Tier
       region: us-west-2
       capacity:
-        billing_mode: "PROVISIONED"
+        billing_mode: PROVISIONED
         read_capacity: 25
         write_capacity: 25
       primary_index:
@@ -52,7 +52,7 @@ params:
     - __name: Pay Per Request
       region: us-west-2
       capacity:
-        billing_mode: "PAY_PER_REQUEST"
+        billing_mode: PAY_PER_REQUEST
       primary_index:
         type: simple
         partition_key: ID
@@ -60,7 +60,7 @@ params:
     - __name: Compound Index
       region: us-west-2
       capacity:
-        billing_mode: "PAY_PER_REQUEST"
+        billing_mode: PAY_PER_REQUEST
       primary_index:
         type: compound
         partition_key: ID
@@ -70,7 +70,7 @@ params:
     - __name: With TTL
       region: us-west-2
       capacity:
-        billing_mode: "PAY_PER_REQUEST"
+        billing_mode: PAY_PER_REQUEST
       primary_index:
         type: compound
         partition_key: ID
@@ -80,7 +80,7 @@ params:
     - __name: With Streams
       region: us-west-2
       capacity:
-        billing_mode: "PAY_PER_REQUEST"
+        billing_mode: PAY_PER_REQUEST
       primary_index:
         type: compound
         partition_key: ID
@@ -95,9 +95,8 @@ params:
     - region
   properties:
     region:
-      title: "Region"
-      $md.immutable: true
       $ref:  https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
+      $md.immutable: true
     capacity:
       type: object
       title: "Capacity"
@@ -135,10 +134,10 @@ params:
       type: object
       title: "Primary Index"
       dependencies:
-        primary_index_type:
+        type:
           oneOf:
             - properties:
-                primary_index_type:
+                type:
                   const: "compound"
                 <<: [ *partition_key_properties, *sort_key_properties]
               required:
@@ -147,14 +146,14 @@ params:
                 - sort_key
                 - sort_key_type
             - properties:
-                primary_index_type:
+                type:
                   const: "simple"
                 <<: *partition_key_properties
               required:
                 - partition_key
                 - partition_key_type
       properties:
-        primary_index_type:
+        type:
           type: string
           title: "Type"
           default: simple
