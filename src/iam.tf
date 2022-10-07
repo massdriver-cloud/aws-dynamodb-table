@@ -1,29 +1,35 @@
 locals {
+  write_actions = [
+    "dynamodb:BatchWriteItem",
+    "dynamodb:DeleteItem",
+    "dynamodb:PartiQLDelete",
+    "dynamodb:PartiQLInsert",
+    "dynamodb:PartiQLUpdate",
+    "dynamodb:PutItem",
+    "dynamodb:UpdateItem",
+  ]
+  read_actions = [
+    "dynamodb:BatchGetItem",
+    "dynamodb:ConditionCheckItem",
+    "dynamodb:GetItem",
+    "dynamodb:PartiQLSelect",
+    "dynamodb:Query",
+    "dynamodb:Scan",
+  ]
   read_statement = [{
-    Action = [
-      "dynamodb:BatchGetItem",
-      "dynamodb:ConditionCheckItem",
-      "dynamodb:GetItem",
-      "dynamodb:PartiQLSelect",
-      "dynamodb:Query",
-      "dynamodb:Scan",
-
-    ]
+    Action   = local.read_actions
     Effect   = "Allow"
     Resource = aws_dynamodb_table.main.arn
   }]
 
   write_statement = [{
-    Action = [
-      "dynamodb:BatchWriteItem",
-      "dynamodb:DeleteItem",
-      "dynamodb:PartiQLDelete",
-      "dynamodb:PartiQLInsert",
-      "dynamodb:PartiQLUpdate",
-      "dynamodb:PutItem",
-      "dynamodb:UpdateItem",
+    Action   = local.write_actions
+    Effect   = "Allow"
+    Resource = aws_dynamodb_table.main.arn
+  }]
 
-    ]
+  read_and_write_statement = [{
+    Action   = concat(local.read_actions, local.write_actions)
     Effect   = "Allow"
     Resource = aws_dynamodb_table.main.arn
   }]
@@ -66,5 +72,14 @@ resource "aws_iam_policy" "read_stream" {
   policy = jsonencode({
     Version   = "2012-10-17"
     Statement = local.read_stream_statement
+  })
+}
+
+resource "aws_iam_policy" "read_and_write" {
+  name        = "${local.name}-read-and-write"
+  description = "AWS Dynamodb read and write policy: ${local.name}"
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = local.read_and_write_statement
   })
 }
