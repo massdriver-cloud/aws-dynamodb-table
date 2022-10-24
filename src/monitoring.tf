@@ -10,12 +10,10 @@ resource "aws_cloudwatch_metric_alarm" "read_capacity" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   threshold           = "80"
-  alarm_description = jsonencode({
-    message = "Total read capacity consumption of Dynamodb table ${local.name} is above 80%. Increase the capacity to avoid throttling."
-  })
-  actions_enabled = "true"
-  alarm_actions   = [module.alarm_channel.arn]
-  ok_actions      = [module.alarm_channel.arn]
+  alarm_description   = "Total read capacity consumption of Dynamodb table ${local.name} is above 80%. Increase the capacity to avoid throttling."
+  actions_enabled     = "true"
+  alarm_actions       = [module.alarm_channel.arn]
+  ok_actions          = [module.alarm_channel.arn]
 
   metric_query {
     id          = "m3"
@@ -70,12 +68,10 @@ resource "aws_cloudwatch_metric_alarm" "write_capacity" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   threshold           = "80"
-  alarm_description = jsonencode({
-    message = "Total Write capacity consumption of Dynamodb table ${local.name} is above 80%. Increase the capacity to avoid throttling."
-  })
-  actions_enabled = "true"
-  alarm_actions   = [module.alarm_channel.arn]
-  ok_actions      = [module.alarm_channel.arn]
+  alarm_description   = "Total Write capacity consumption of Dynamodb table ${local.name} is above 80%. Increase the capacity to avoid throttling."
+  actions_enabled     = "true"
+  alarm_actions       = [module.alarm_channel.arn]
+  ok_actions          = [module.alarm_channel.arn]
 
   metric_query {
     id          = "m3"
