@@ -1,5 +1,5 @@
 module "alarm_channel" {
-  source      = "github.com/massdriver-cloud/terraform-modules//aws-alarm-channel?ref=926c1a2"
+  source      = "github.com/massdriver-cloud/terraform-modules//aws/alarm-channel?ref=b3f3449"
   md_metadata = var.md_metadata
 }
 
