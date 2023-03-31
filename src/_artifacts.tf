@@ -16,7 +16,7 @@ resource "massdriver_artifact" "table" {
             write = {
               policy_arn = aws_iam_policy.write.arn
             }
-            read-and-write = {
+            read_write = {
               policy_arn = aws_iam_policy.read_and_write.arn
             }
           }
