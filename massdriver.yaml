@@ -53,6 +53,7 @@ ImmutableSortKeyProperties: &immutable_sort_key_properties
     type: string
     title: "Sort Key Type"
     $md.immutable: true
+    <<: *valid_index_data_types
 
 Index: &index
   dependencies:

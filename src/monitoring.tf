@@ -117,7 +117,7 @@ resource "massdriver_package_alarm" "write_capacity" {
   display_name      = "DynamoDB Write Capacity Utilization"
 }
 
-module "gsi_write_capcity" {
+module "gsi_write_capacity" {
   for_each            = local.global_secondary_indexes
   source              = "github.com/massdriver-cloud/terraform-modules//aws/cloudwatch-alarm-expression?ref=29df3b2"
   sns_topic_arn       = module.alarm_channel.arn
@@ -167,7 +167,7 @@ module "gsi_write_capcity" {
   }
 }
 
-module "gsi_read_capcity" {
+module "gsi_read_capacity" {
   for_each            = local.global_secondary_indexes
   source              = "github.com/massdriver-cloud/terraform-modules//aws/cloudwatch-alarm-expression?ref=29df3b2"
   sns_topic_arn       = module.alarm_channel.arn

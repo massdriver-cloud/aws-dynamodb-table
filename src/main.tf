@@ -5,8 +5,8 @@ locals {
   sort_key                     = var.primary_index.type == "compound" ? [1] : []
   stream_view_type             = var.stream.enabled ? var.stream.view_type : null
   name                         = var.md_metadata.name_prefix
-  has_global_secondary_indexes = var.global_secondary_indexes != null && length(var.global_secondary_indexes) > 0
-  global_secondary_indexes     = local.has_global_secondary_indexes ? { for index in var.global_secondary_indexes : index.name => index } : null
+  has_global_secondary_indexes = var.global_secondary_indexes != null && try((length(var.global_secondary_indexes) > 0), false)
+  global_secondary_indexes     = local.has_global_secondary_indexes ? { for index in var.global_secondary_indexes : index.name => index } : {}
   # All indexed attributes must be declared. Genearting this list is _rough_. All indexes will have a partition key but the sort key is optional.
   # We are creating an array of arrays of arrays, emptying any lists where the sort_key values are null, flattening the list so we have an array of
   # [key_name, key_type, key_name1, key_type1] then chunking the list to become [[key_name, key_type], [key_name1, key_type1]] and using that in a dynamic block
