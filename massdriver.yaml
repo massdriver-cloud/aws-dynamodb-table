@@ -19,6 +19,24 @@ PartitionKeyProperties: &partition_key_properties
   partition_key:
     type: string
     title: "Partition Key"
+  partition_key_type:
+    type: string
+    title: "Partition Key Type"
+    <<: *valid_index_data_types
+
+SortKeyProperties: &sort_key_properties
+  sort_key:
+    type: string
+    title: "Sort Key"
+  sort_key_type:
+    type: string
+    title: "Sort Key Type"
+    <<: *valid_index_data_types
+
+ImmutablePartitionKeyProperties: &immutable_partition_key_properties
+  partition_key:
+    type: string
+    title: "Partition Key"
     $md.immutable: true
   partition_key_type:
     type: string
@@ -26,7 +44,7 @@ PartitionKeyProperties: &partition_key_properties
     $md.immutable: true
     <<: *valid_index_data_types
 
-SortKeyProperties: &sort_key_properties
+ImmutableSortKeyProperties: &immutable_sort_key_properties
   sort_key:
     type: string
     title: "Sort Key"
@@ -36,6 +54,38 @@ SortKeyProperties: &sort_key_properties
     title: "Sort Key Type"
     $md.immutable: true
     <<: *valid_index_data_types
+
+Index: &index
+  dependencies:
+    type:
+      oneOf:
+        - properties:
+            type:
+              const: "compound"
+            <<:
+              - *immutable_partition_key_properties
+              - *immutable_sort_key_properties
+          required:
+            - partition_key
+            - partition_key_type
+            - sort_key
+            - sort_key_type
+        - properties:
+            type:
+              const: "simple"
+            <<: *immutable_partition_key_properties
+          required:
+            - partition_key
+            - partition_key_type
+  properties:
+    type:
+      type: string
+      title: "Type"
+      default: simple
+      $md.immutable: true
+      enum:
+        - simple
+        - compound
 
 # schema-params.json
 # JSON Schema sans-fields above
@@ -99,7 +149,7 @@ params:
     - region
   properties:
     region:
-      $ref:  https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
+      $ref: https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
       $md.immutable: true
     capacity:
       type: object
@@ -137,34 +187,74 @@ params:
     primary_index:
       type: object
       title: "Primary Index"
-      dependencies:
-        type:
-          oneOf:
-            - properties:
-                type:
-                  const: "compound"
-                <<: [ *partition_key_properties, *sort_key_properties]
-              required:
-                - partition_key
-                - partition_key_type
-                - sort_key
-                - sort_key_type
-            - properties:
-                type:
-                  const: "simple"
-                <<: *partition_key_properties
-              required:
-                - partition_key
-                - partition_key_type
-      properties:
-        type:
-          type: string
-          title: "Type"
-          default: simple
-          $md.immutable: true
-          enum:
-            - simple
-            - compound
+      <<: *index
+    global_secondary_indexes:
+      type: array
+      title: "Global Secondary Indexes"
+      items:
+        type: object
+        title: Index
+        required:
+          - name
+          - projection_type
+          - read_capacity
+          - write_capacity
+        properties:
+          name:
+            type: string
+            description: Index name for queries
+            title: Index Name
+          projection_type:
+            type: string
+            description: Represents the non-key attribute names which will be projected into the index.
+            title: Projection Type
+            default: ALL
+            enum:
+              - ALL
+              - KEYS_ONLY
+              - INCLUDE
+          read_capacity:
+            type: integer
+            title: "Read Capacity"
+            minimum: 1
+            maximum: 3000
+          write_capacity:
+            type: integer
+            title: "Write Capacity"
+            minimum: 1
+            maximum: 1000
+          attributes:
+            title: Attributes
+            dependencies:
+              type:
+                oneOf:
+                  - properties:
+                      type:
+                        const: "compound"
+                      <<:
+                        - *partition_key_properties
+                        - *sort_key_properties
+                    required:
+                      - partition_key
+                      - partition_key_type
+                      - sort_key
+                      - sort_key_type
+                  - properties:
+                      type:
+                        const: "simple"
+                      <<: *partition_key_properties
+                    required:
+                      - partition_key
+                      - partition_key_type
+            properties:
+              type:
+                type: string
+                title: "Type"
+                default: simple
+                enum:
+                  - simple
+                  - compound
+
     stream:
       type: object
       title: "DynamoDB Streams"
@@ -203,7 +293,6 @@ params:
           title: "Enabled?"
           default: false
 
-
 # schema-connections.json
 # Named list of input connections (artifacts) (map[name]artifact)
 connections:
@@ -231,8 +320,17 @@ ui:
     - region
     - capacity
     - primary_index
+    - global_secondary_indexes
     - ttl
     - stream
   region:
     ui:field: supportedCloudLocationsDropdown
     cloudService: aws
+  global_secondary_indexes:
+    items:
+      ui:order:
+        - name
+        - attributes
+        - read_capacity
+        - write_capacity
+        - projection_type

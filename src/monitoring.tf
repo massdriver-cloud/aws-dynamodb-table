@@ -116,3 +116,103 @@ resource "massdriver_package_alarm" "write_capacity" {
   cloud_resource_id = aws_cloudwatch_metric_alarm.write_capacity[count.index].arn
   display_name      = "DynamoDB Write Capacity Utilization"
 }
+
+module "gsi_write_capacity" {
+  for_each            = local.global_secondary_indexes
+  source              = "github.com/massdriver-cloud/terraform-modules//aws/cloudwatch-alarm-expression?ref=29df3b2"
+  sns_topic_arn       = module.alarm_channel.arn
+  md_metadata         = var.md_metadata
+  alarm_name          = "${local.name}-${each.key}: Write Capacity Usage"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  message             = "Global Secondary Index ${each.key} for table ${local.name}: Write Capcity Consumed > 80%. Increase provisioned write capacity."
+  display_name        = "Global Secondary Index ${each.key}: Write Capacity Usage"
+  threshold           = "80"
+  display_metric_key  = "m1"
+
+  metric_queries = {
+    m1 = {
+      metric = {
+        metric_name = "ConsumedWriteCapacityUnits"
+        namespace   = "AWS/DynamoDB"
+        period      = "60"
+        stat        = "Sum"
+
+        dimensions = {
+          TableName                = local.name
+          GlobalSecondaryIndexName = each.key
+        }
+      }
+    }
+
+    m2 = {
+      metric = {
+        metric_name = "ProvisionedWriteCapacityUnits"
+        namespace   = "AWS/DynamoDB"
+        period      = "60"
+        stat        = "Sum"
+
+        dimensions = {
+          TableName                = local.name
+          GlobalSecondaryIndexName = each.key
+        }
+      }
+    }
+
+    m3 = {
+      expression  = "(m1 / m2) * 100"
+      label       = "Write Capacity Consumed"
+      return_data = true
+    }
+  }
+}
+
+module "gsi_read_capacity" {
+  for_each            = local.global_secondary_indexes
+  source              = "github.com/massdriver-cloud/terraform-modules//aws/cloudwatch-alarm-expression?ref=29df3b2"
+  sns_topic_arn       = module.alarm_channel.arn
+  md_metadata         = var.md_metadata
+  alarm_name          = "${local.name}-${each.key}: Read Capacity Usage"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  message             = "Global Secondary Index ${each.key} for table ${local.name}: Read Capcity Consumed > 80%. Increase provisioned read capacity."
+  display_name        = "Global Secondary Index ${each.key}: Read Capacity Usage"
+  threshold           = "80"
+  display_metric_key  = "m1"
+
+  metric_queries = {
+    m1 = {
+      metric = {
+        metric_name = "ConsumedReadCapacityUnits"
+        namespace   = "AWS/DynamoDB"
+        period      = "60"
+        stat        = "Sum"
+
+        dimensions = {
+          TableName                = local.name
+          GlobalSecondaryIndexName = each.key
+        }
+      }
+    }
+
+    m2 = {
+      metric = {
+        metric_name = "ProvisionedReadCapacityUnits"
+        namespace   = "AWS/DynamoDB"
+        period      = "60"
+        stat        = "Sum"
+
+        dimensions = {
+          TableName                = local.name
+          GlobalSecondaryIndexName = each.key
+        }
+      }
+    }
+
+    m3 = {
+      expression  = "(m1 / m2) * 100"
+      label       = "Read Capacity Consumed"
+      return_data = true
+    }
+  }
+}
