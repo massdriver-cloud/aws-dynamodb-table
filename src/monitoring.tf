@@ -1,4 +1,4 @@
-local {
+locals {
   period = "60"
 }
 
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "write_capacity" {
 
   metric_query {
     id          = "m3"
-    expression  = "(m1 / (m2 * ${local.period}) * 100"
+    expression  = "(m1 / (m2 * ${local.period})) * 100"
     label       = "Read Capacity Consumed"
     return_data = true
   }
@@ -164,7 +164,7 @@ module "gsi_write_capacity" {
     }
 
     m3 = {
-      expression  = "(m1 / (m2 * ${local.period}) * 100"
+      expression  = "(m1 / (m2 * ${local.period})) * 100"
       label       = "Write Capacity Consumed"
       return_data = true
     }
