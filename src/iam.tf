@@ -22,7 +22,7 @@ locals {
     Effect = "Allow"
     Resource = [
       aws_dynamodb_table.main.arn,
-      "${aws_dynamodb_table.main.arn}/indexes/*"
+      "${aws_dynamodb_table.main.arn}/index/*"
     ]
   }]
 
@@ -37,7 +37,7 @@ locals {
     Effect = "Allow"
     Resource = [
       aws_dynamodb_table.main.arn,
-      "${aws_dynamodb_table.main.arn}/indexes/*"
+      "${aws_dynamodb_table.main.arn}/index/*"
     ]
   }]
 
