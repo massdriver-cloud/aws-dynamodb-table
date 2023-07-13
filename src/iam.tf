@@ -16,10 +16,14 @@ locals {
     "dynamodb:Query",
     "dynamodb:Scan",
   ]
+
   read_statement = [{
-    Action   = local.read_actions
-    Effect   = "Allow"
-    Resource = aws_dynamodb_table.main.arn
+    Action = local.read_actions
+    Effect = "Allow"
+    Resource = [
+      aws_dynamodb_table.main.arn,
+      "${aws_dynamodb_table.main.arn}/indexes/*"
+    ]
   }]
 
   write_statement = [{
@@ -29,9 +33,12 @@ locals {
   }]
 
   read_and_write_statement = [{
-    Action   = concat(local.read_actions, local.write_actions)
-    Effect   = "Allow"
-    Resource = aws_dynamodb_table.main.arn
+    Action = concat(local.read_actions, local.write_actions)
+    Effect = "Allow"
+    Resource = [
+      aws_dynamodb_table.main.arn,
+      "${aws_dynamodb_table.main.arn}/indexes/*"
+    ]
   }]
 
   read_stream_statement = [{
