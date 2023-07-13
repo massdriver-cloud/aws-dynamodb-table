@@ -1,3 +1,7 @@
+locals {
+  period = "60"
+}
+
 module "alarm_channel" {
   source      = "github.com/massdriver-cloud/terraform-modules//aws/alarm-channel?ref=b3f3449"
   md_metadata = var.md_metadata
@@ -17,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "read_capacity" {
 
   metric_query {
     id          = "m3"
-    expression  = "m1 / m2"
+    expression  = "(m1 / (m2 * ${local.period})) * 100"
     label       = "Read Capacity Consumed"
     return_data = true
   }
@@ -29,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "read_capacity" {
     metric {
       metric_name = "ConsumedReadCapacityUnits"
       namespace   = "AWS/DynamoDB"
-      period      = "60"
+      period      = local.period
       stat        = "Sum"
 
       dimensions = {
@@ -45,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "read_capacity" {
     metric {
       metric_name = "ProvisionedReadCapacityUnits"
       namespace   = "AWS/DynamoDB"
-      period      = "60"
+      period      = local.period
       stat        = "Sum"
 
       dimensions = {
@@ -75,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "write_capacity" {
 
   metric_query {
     id          = "m3"
-    expression  = "(m1 / m2) * 100"
+    expression  = "(m1 / (m2 * ${local.period})) * 100"
     label       = "Read Capacity Consumed"
     return_data = true
   }
@@ -86,7 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "write_capacity" {
     metric {
       metric_name = "ConsumedWriteCapacityUnits"
       namespace   = "AWS/DynamoDB"
-      period      = "60"
+      period      = local.period
       stat        = "Sum"
 
       dimensions = {
@@ -101,7 +105,7 @@ resource "aws_cloudwatch_metric_alarm" "write_capacity" {
     metric {
       metric_name = "ProvisionedWriteCapacityUnits"
       namespace   = "AWS/DynamoDB"
-      period      = "60"
+      period      = local.period
       stat        = "Sum"
 
       dimensions = {
@@ -135,7 +139,7 @@ module "gsi_write_capacity" {
       metric = {
         metric_name = "ConsumedWriteCapacityUnits"
         namespace   = "AWS/DynamoDB"
-        period      = "60"
+        period      = local.period
         stat        = "Sum"
 
         dimensions = {
@@ -149,7 +153,7 @@ module "gsi_write_capacity" {
       metric = {
         metric_name = "ProvisionedWriteCapacityUnits"
         namespace   = "AWS/DynamoDB"
-        period      = "60"
+        period      = local.period
         stat        = "Sum"
 
         dimensions = {
@@ -160,7 +164,7 @@ module "gsi_write_capacity" {
     }
 
     m3 = {
-      expression  = "(m1 / m2) * 100"
+      expression  = "(m1 / (m2 * ${local.period})) * 100"
       label       = "Write Capacity Consumed"
       return_data = true
     }
@@ -185,7 +189,7 @@ module "gsi_read_capacity" {
       metric = {
         metric_name = "ConsumedReadCapacityUnits"
         namespace   = "AWS/DynamoDB"
-        period      = "60"
+        period      = local.period
         stat        = "Sum"
 
         dimensions = {
@@ -199,7 +203,7 @@ module "gsi_read_capacity" {
       metric = {
         metric_name = "ProvisionedReadCapacityUnits"
         namespace   = "AWS/DynamoDB"
-        period      = "60"
+        period      = local.period
         stat        = "Sum"
 
         dimensions = {
@@ -210,7 +214,7 @@ module "gsi_read_capacity" {
     }
 
     m3 = {
-      expression  = "(m1 / m2) * 100"
+      expression  = "(m1 / (m2 * ${local.period})) * 100"
       label       = "Read Capacity Consumed"
       return_data = true
     }
