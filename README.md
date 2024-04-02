@@ -60,6 +60,14 @@ Form input parameters for configuring a bundle for deployment.
 
 - **`capacity`** *(object)*
   - **`billing_mode`** *(string)*: Must be one of: `['PAY_PER_REQUEST', 'PROVISIONED']`. Default: `PAY_PER_REQUEST`.
+- **`global_secondary_indexes`** *(array)*
+  - **Items** *(object)*
+    - **`attributes`**
+      - **`type`** *(string)*: Must be one of: `['simple', 'compound']`. Default: `simple`.
+    - **`name`** *(string)*: Index name for queries.
+    - **`projection_type`** *(string)*: Represents the non-key attribute names which will be projected into the index. Must be one of: `['ALL', 'KEYS_ONLY', 'INCLUDE']`. Default: `ALL`.
+    - **`read_capacity`** *(integer)*: Minimum: `1`. Maximum: `3000`.
+    - **`write_capacity`** *(integer)*: Minimum: `1`. Maximum: `1000`.
 - **`primary_index`** *(object)*
   - **`type`** *(string)*: Must be one of: `['simple', 'compound']`. Default: `simple`.
 - **`region`** *(string)*: AWS Region to provision in.
@@ -232,7 +240,7 @@ Resources created by this bundle that can be connected to other bundles.
 
     - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
       - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z-/]+$`** *(object)*
+        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
           - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
             Examples:
@@ -243,6 +251,18 @@ Resources created by this bundle that can be connected to other bundles.
             ```json
             "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
             ```
+
+      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
+
+          Examples:
+          ```json
+          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+          ```
+
+          ```json
+          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+          ```
 
       - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
         - **`^[a-z-]+$`** *(object)*
@@ -284,7 +304,7 @@ Resources created by this bundle that can be connected to other bundles.
 
     - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
       - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z-/]+$`** *(object)*
+        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
           - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
             Examples:
@@ -295,6 +315,18 @@ Resources created by this bundle that can be connected to other bundles.
             ```json
             "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
             ```
+
+      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
+
+          Examples:
+          ```json
+          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+          ```
+
+          ```json
+          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+          ```
 
       - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
         - **`^[a-z-]+$`** *(object)*
