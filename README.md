@@ -17,7 +17,7 @@ Dynamodb table with optional data stream
 
 ## Design
 
-For detailed information, check out our [Operator Guide](operator.mdx) for this bundle.
+For detailed information, check out our [Operator Guide](operator.md) for this bundle.
 
 ## Usage
 
@@ -37,122 +37,8 @@ Form input parameters for configuring a bundle for deployment.
 <summary>View</summary>
 
 <!-- PARAMS:START -->
-## Properties
 
-- **`capacity`** *(object)*
-  - **`billing_mode`** *(string)*: Must be one of: `['PAY_PER_REQUEST', 'PROVISIONED']`. Default: `PAY_PER_REQUEST`.
-- **`global_secondary_indexes`** *(array)*
-  - **Items** *(object)*
-    - **`attributes`**
-      - **`type`** *(string)*: Must be one of: `['simple', 'compound']`. Default: `simple`.
-    - **`name`** *(string)*: Index name for queries.
-    - **`projection_type`** *(string)*: Represents the non-key attribute names which will be projected into the index. Must be one of: `['ALL', 'KEYS_ONLY', 'INCLUDE']`. Default: `ALL`.
-    - **`read_capacity`** *(integer)*: Minimum: `1`. Maximum: `3000`.
-    - **`write_capacity`** *(integer)*: Minimum: `1`. Maximum: `1000`.
-- **`primary_index`** *(object)*
-  - **`type`** *(string)*: Must be one of: `['simple', 'compound']`. Default: `simple`.
-- **`region`** *(string)*: AWS Region to provision in.
-
-  Examples:
-  ```json
-  "us-west-2"
-  ```
-
-- **`stream`** *(object)*: Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service.
-  - **`enabled`** *(boolean)*: Default: `False`.
-- **`ttl`** *(object)*: Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'.
-  - **`enabled`** *(boolean)*: Default: `False`.
-## Examples
-
-  ```json
-  {
-      "__name": "Free Tier",
-      "capacity": {
-          "billing_mode": "PROVISIONED",
-          "read_capacity": 25,
-          "write_capacity": 25
-      },
-      "primary_index": {
-          "partition_key": "ID",
-          "partition_key_type": "S",
-          "type": "simple"
-      },
-      "region": "us-west-2",
-      "ttl": {
-          "enabled": true
-      }
-  }
-  ```
-
-  ```json
-  {
-      "__name": "Pay Per Request",
-      "capacity": {
-          "billing_mode": "PAY_PER_REQUEST"
-      },
-      "primary_index": {
-          "partition_key": "ID",
-          "partition_key_type": "S",
-          "type": "simple"
-      },
-      "region": "us-west-2"
-  }
-  ```
-
-  ```json
-  {
-      "__name": "Compound Index",
-      "capacity": {
-          "billing_mode": "PAY_PER_REQUEST"
-      },
-      "primary_index": {
-          "partition_key": "ID",
-          "partition_key_type": "S",
-          "sort_key": "Date",
-          "sort_key_type": "S",
-          "type": "compound"
-      },
-      "region": "us-west-2"
-  }
-  ```
-
-  ```json
-  {
-      "__name": "With TTL",
-      "capacity": {
-          "billing_mode": "PAY_PER_REQUEST"
-      },
-      "primary_index": {
-          "partition_key": "ID",
-          "partition_key_type": "S",
-          "sort_key": "Date",
-          "sort_key_type": "S",
-          "type": "compound"
-      },
-      "region": "us-west-2"
-  }
-  ```
-
-  ```json
-  {
-      "__name": "With Streams",
-      "capacity": {
-          "billing_mode": "PAY_PER_REQUEST"
-      },
-      "primary_index": {
-          "partition_key": "ID",
-          "partition_key_type": "S",
-          "sort_key": "Date",
-          "sort_key_type": "S",
-          "type": "compound"
-      },
-      "region": "us-west-2",
-      "stream": {
-          "enabled": true,
-          "view_type": "KEYS_ONLY"
-      }
-  }
-  ```
+**Params coming soon**
 
 <!-- PARAMS:END -->
 
@@ -166,30 +52,8 @@ Connections from other bundles that this bundle depends on.
 <summary>View</summary>
 
 <!-- CONNECTIONS:START -->
-## Properties
 
-- **`authentication`** *(object)*: . Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`arn`** *(string)*: Amazon Resource Name.
-
-      Examples:
-      ```json
-      "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-      ```
-
-      ```json
-      "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-      ```
-
-    - **`external_id`** *(string)*: An external ID is a piece of data that can be passed to the AssumeRole API of the Security Token Service (STS). You can then use the external ID in the condition element in a role's trust policy, allowing the role to be assumed only when a certain value is present in the external ID.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
+**Connections coming soon**
 
 <!-- CONNECTIONS:END -->
 
@@ -203,135 +67,8 @@ Resources created by this bundle that can be connected to other bundles.
 <summary>View</summary>
 
 <!-- ARTIFACTS:START -->
-## Properties
 
-- **`stream`** *(object)*: . Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`infrastructure`** *(object)*
-      - **`arn`** *(string)*: Amazon Resource Name.
-
-        Examples:
-        ```json
-        "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-        ```
-
-        ```json
-        "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-        ```
-
-    - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
-      - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
-          - **`policy_arn`** *(string)*: AWS IAM policy ARN.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
-        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
-
-          Examples:
-          ```json
-          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-          ```
-
-          ```json
-          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-          ```
-
-      - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
-        - **`^[a-z-]+$`** *(object)*
-          - **`arn`** *(string)*: Amazon Resource Name.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-          - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
-          - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
-
-- **`table`** *(object)*: . Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`infrastructure`** *(object)*
-      - **`arn`** *(string)*: Amazon Resource Name.
-
-        Examples:
-        ```json
-        "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-        ```
-
-        ```json
-        "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-        ```
-
-    - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
-      - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
-          - **`policy_arn`** *(string)*: AWS IAM policy ARN.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
-        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
-
-          Examples:
-          ```json
-          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-          ```
-
-          ```json
-          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-          ```
-
-      - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
-        - **`^[a-z-]+$`** *(object)*
-          - **`arn`** *(string)*: Amazon Resource Name.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-          - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
-          - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
+**Artifacts coming soon**
 
 <!-- ARTIFACTS:END -->
 
