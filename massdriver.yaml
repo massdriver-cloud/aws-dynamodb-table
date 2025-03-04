@@ -148,6 +148,12 @@ params:
 
   required:
     - region
+    - capacity
+    - primary_index
+    - global_secondary_indexes
+    - stream
+    - ttl
+    - pitr
   properties:
     region:
       $ref: https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
@@ -260,6 +266,8 @@ params:
       type: object
       title: DynamoDB Streams
       description: Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service.
+      required:
+        - enabled
       dependencies:
         enabled:
           oneOf:
@@ -288,6 +296,8 @@ params:
       type: object
       title: TTL
       description: Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'
+      required:
+        - enabled
       properties:
         enabled:
           type: boolean
@@ -297,6 +307,8 @@ params:
       type: object
       title: Point-in-time Recovery
       description: Enable point-in-time recovery for your DynamoDB table.
+      required:
+        - enabled
       properties:
         enabled:
           type: boolean
