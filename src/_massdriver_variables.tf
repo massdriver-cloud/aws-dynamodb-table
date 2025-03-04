@@ -18,7 +18,6 @@ variable "capacity" {
     read_capacity  = optional(number)
     write_capacity = optional(number)
   })
-  default = null
 }
 variable "global_secondary_indexes" {
   type = list(object({
@@ -28,7 +27,6 @@ variable "global_secondary_indexes" {
     read_capacity   = number
     write_capacity  = number
   }))
-  default = null
 }
 variable "md_metadata" {
   type = object({
@@ -57,6 +55,11 @@ variable "md_metadata" {
     })
   })
 }
+variable "pitr" {
+  type = object({
+    enabled = bool
+  })
+}
 variable "primary_index" {
   type = object({
     type               = optional(string)
@@ -65,21 +68,18 @@ variable "primary_index" {
     sort_key           = optional(string)
     sort_key_type      = optional(string)
   })
-  default = null
 }
 variable "region" {
   type = string
 }
 variable "stream" {
   type = object({
-    enabled   = optional(bool)
+    enabled   = bool
     view_type = optional(string)
   })
-  default = null
 }
 variable "ttl" {
   type = object({
-    enabled = optional(bool)
+    enabled = bool
   })
-  default = null
 }
