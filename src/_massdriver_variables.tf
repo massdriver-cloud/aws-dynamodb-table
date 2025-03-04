@@ -83,3 +83,10 @@ variable "ttl" {
   })
   default = null
 }
+// Auto-generated variable declarations from massdriver.yaml
+variable "pitr" {
+  type = object({
+    enabled = optional(bool)
+  })
+  default = null
+}

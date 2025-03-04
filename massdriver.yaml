@@ -1,57 +1,60 @@
-# This file will be used to generate all of the schema-*.json files in a bundle
 schema: draft-07
-name: "aws-dynamodb-table"
-description: "Dynamodb table with optional data stream"
+name: aws-dynamodb-table
+description: Dynamodb table with optional data stream
 source_url: github.com/massdriver-cloud/aws-dynamodb-table
-access: "public"
-type: "bundle"
+access: public
+type: infrastructure
+
+steps:
+  - path: src
+    provisioner: terraform
 
 ValidIndexDataTypes: &valid_index_data_types
   oneOf:
     - title: String
-      const: "S"
+      const: S
     - title: Number
-      const: "N"
+      const: N
     - title: Binary
-      const: "B"
+      const: B
 
 PartitionKeyProperties: &partition_key_properties
   partition_key:
     type: string
-    title: "Partition Key"
+    title: Partition Key
   partition_key_type:
     type: string
-    title: "Partition Key Type"
+    title: Partition Key Type
     <<: *valid_index_data_types
 
 SortKeyProperties: &sort_key_properties
   sort_key:
     type: string
-    title: "Sort Key"
+    title: Sort Key
   sort_key_type:
     type: string
-    title: "Sort Key Type"
+    title: Sort Key Type
     <<: *valid_index_data_types
 
 ImmutablePartitionKeyProperties: &immutable_partition_key_properties
   partition_key:
     type: string
-    title: "Partition Key"
+    title: Partition Key
     $md.immutable: true
   partition_key_type:
     type: string
-    title: "Partition Key Type"
+    title: Partition Key Type
     $md.immutable: true
     <<: *valid_index_data_types
 
 ImmutableSortKeyProperties: &immutable_sort_key_properties
   sort_key:
     type: string
-    title: "Sort Key"
+    title: Sort Key
     $md.immutable: true
   sort_key_type:
     type: string
-    title: "Sort Key Type"
+    title: Sort Key Type
     $md.immutable: true
     <<: *valid_index_data_types
 
@@ -61,7 +64,7 @@ Index: &index
       oneOf:
         - properties:
             type:
-              const: "compound"
+              const: compound
             <<:
               - *immutable_partition_key_properties
               - *immutable_sort_key_properties
@@ -72,7 +75,7 @@ Index: &index
             - sort_key_type
         - properties:
             type:
-              const: "simple"
+              const: simple
             <<: *immutable_partition_key_properties
           required:
             - partition_key
@@ -80,15 +83,13 @@ Index: &index
   properties:
     type:
       type: string
-      title: "Type"
+      title: Type
       default: simple
       $md.immutable: true
       enum:
         - simple
         - compound
 
-# schema-params.json
-# JSON Schema sans-fields above
 params:
   examples:
     - __name: Free Tier
@@ -143,7 +144,7 @@ params:
         sort_key_type: S
       stream:
         enabled: true
-        view_type: "KEYS_ONLY"
+        view_type: KEYS_ONLY
 
   required:
     - region
@@ -153,7 +154,7 @@ params:
       $md.immutable: true
     capacity:
       type: object
-      title: "Capacity"
+      title: Capacity
       dependencies:
         billing_mode:
           oneOf:
@@ -162,12 +163,12 @@ params:
                   const: PROVISIONED
                 read_capacity:
                   type: integer
-                  title: "Read Capacity"
+                  title: Read Capacity
                   minimum: 1
                   maximum: 3000
                 write_capacity:
                   type: integer
-                  title: "Write Capacity"
+                  title: Write Capacity
                   minimum: 1
                   maximum: 1000
               required:
@@ -179,18 +180,18 @@ params:
       properties:
         billing_mode:
           type: string
-          title: "Billing Mode"
+          title: Billing Mode
           default: PAY_PER_REQUEST
           enum:
             - PAY_PER_REQUEST
             - PROVISIONED
     primary_index:
       type: object
-      title: "Primary Index"
+      title: Primary Index
       <<: *index
     global_secondary_indexes:
       type: array
-      title: "Global Secondary Indexes"
+      title: Global Secondary Indexes
       items:
         type: object
         title: Index
@@ -215,12 +216,12 @@ params:
               - INCLUDE
           read_capacity:
             type: integer
-            title: "Read Capacity"
+            title: Read Capacity
             minimum: 1
             maximum: 3000
           write_capacity:
             type: integer
-            title: "Write Capacity"
+            title: Write Capacity
             minimum: 1
             maximum: 1000
           attributes:
@@ -230,7 +231,7 @@ params:
                 oneOf:
                   - properties:
                       type:
-                        const: "compound"
+                        const: compound
                       <<:
                         - *partition_key_properties
                         - *sort_key_properties
@@ -241,7 +242,7 @@ params:
                       - sort_key_type
                   - properties:
                       type:
-                        const: "simple"
+                        const: simple
                       <<: *partition_key_properties
                     required:
                       - partition_key
@@ -249,7 +250,7 @@ params:
             properties:
               type:
                 type: string
-                title: "Type"
+                title: Type
                 default: simple
                 enum:
                   - simple
@@ -257,8 +258,8 @@ params:
 
     stream:
       type: object
-      title: "DynamoDB Streams"
-      description: "Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service."
+      title: DynamoDB Streams
+      description: Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service.
       dependencies:
         enabled:
           oneOf:
@@ -282,19 +283,26 @@ params:
         enabled:
           type: boolean
           default: false
-          title: "Enabled?"
+          title: Enable
     ttl:
       type: object
-      title: "TTL"
-      description: "Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'"
+      title: TTL
+      description: Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'
       properties:
         enabled:
           type: boolean
-          title: "Enabled?"
+          title: Enable
+          default: false
+    pitr:
+      type: object
+      title: Point-in-time Recovery
+      description: Enable point-in-time recovery for your DynamoDB table.
+      properties:
+        enabled:
+          type: boolean
+          title: Enable
           default: false
 
-# schema-connections.json
-# Named list of input connections (artifacts) (map[name]artifact)
 connections:
   required:
     - authentication
@@ -302,8 +310,6 @@ connections:
     authentication:
       $ref: massdriver/aws-iam-role
 
-# schema-artifacts.json
-# Named list of output artifacts  (map[name]artifact)
 artifacts:
   required:
     - table
@@ -313,8 +319,6 @@ artifacts:
     stream:
       $ref: massdriver/aws-dynamodb-stream
 
-# schema-ui.json
-# List of form customizations for params-schema
 ui:
   ui:order:
     - region
@@ -323,6 +327,7 @@ ui:
     - global_secondary_indexes
     - ttl
     - stream
+    - pitr
   region:
     ui:field: supportedCloudLocationsDropdown
     cloudService: aws
