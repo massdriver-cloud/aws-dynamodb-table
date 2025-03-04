@@ -2,7 +2,6 @@ locals {
   read_capacity  = var.capacity.billing_mode == "PROVISIONED" ? var.capacity.read_capacity : null
   write_capacity = var.capacity.billing_mode == "PROVISIONED" ? var.capacity.write_capacity : null
   range_key      = var.primary_index.type == "compound" ? var.primary_index.sort_key : null
-  # sort_key                     = var.primary_index.type == "compound" ? [1] : []
   stream_view_type             = var.stream.enabled ? var.stream.view_type : null
   name                         = var.md_metadata.name_prefix
   has_global_secondary_indexes = var.global_secondary_indexes != null && try((length(var.global_secondary_indexes) > 0), false)
