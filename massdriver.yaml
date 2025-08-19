@@ -3,7 +3,6 @@ name: aws-dynamodb-table
 version: 1.0.0
 description: Dynamodb table with optional data stream
 source_url: https://github.com/massdriver-cloud/aws-dynamodb-table
-type: application
 steps:
 - path: src
   provisioner: opentofu
