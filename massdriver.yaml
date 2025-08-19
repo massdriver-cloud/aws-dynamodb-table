@@ -1,200 +1,194 @@
 schema: draft-07
 name: aws-dynamodb-table
+version: 1.0.0
 description: Dynamodb table with optional data stream
-source_url: github.com/massdriver-cloud/aws-dynamodb-table
-access: public
-type: infrastructure
-
+source_url: https://github.com/massdriver-cloud/aws-dynamodb-table
+type: application
 steps:
-  - path: src
-    provisioner: terraform
-
-ValidIndexDataTypes: &valid_index_data_types
-  oneOf:
-    - title: String
-      const: S
-    - title: Number
-      const: N
-    - title: Binary
-      const: B
-
-PartitionKeyProperties: &partition_key_properties
-  partition_key:
+- path: src
+  provisioner: opentofu
+ValidIndexDataTypes:
+  oneOf: &1
+  - title: String
+    const: S
+  - title: Number
+    const: N
+  - title: Binary
+    const: B
+PartitionKeyProperties:
+  partition_key: &10
     type: string
     title: Partition Key
-  partition_key_type:
+  partition_key_type: &11
     type: string
     title: Partition Key Type
-    <<: *valid_index_data_types
-
-SortKeyProperties: &sort_key_properties
-  sort_key:
+    oneOf: *1
+SortKeyProperties:
+  sort_key: &8
     type: string
     title: Sort Key
-  sort_key_type:
+  sort_key_type: &9
     type: string
     title: Sort Key Type
-    <<: *valid_index_data_types
-
-ImmutablePartitionKeyProperties: &immutable_partition_key_properties
-  partition_key:
+    oneOf: *1
+ImmutablePartitionKeyProperties:
+  partition_key: &4
     type: string
     title: Partition Key
-    $md.immutable: true
-  partition_key_type:
+    "$md.immutable": true
+  partition_key_type: &5
     type: string
     title: Partition Key Type
-    $md.immutable: true
-    <<: *valid_index_data_types
-
-ImmutableSortKeyProperties: &immutable_sort_key_properties
-  sort_key:
+    "$md.immutable": true
+    oneOf: *1
+ImmutableSortKeyProperties:
+  sort_key: &2
     type: string
     title: Sort Key
-    $md.immutable: true
-  sort_key_type:
+    "$md.immutable": true
+  sort_key_type: &3
     type: string
     title: Sort Key Type
-    $md.immutable: true
-    <<: *valid_index_data_types
-
-Index: &index
-  dependencies:
+    "$md.immutable": true
+    oneOf: *1
+Index:
+  dependencies: &6
     type:
       oneOf:
-        - properties:
-            type:
-              const: compound
-            <<:
-              - *immutable_partition_key_properties
-              - *immutable_sort_key_properties
-          required:
-            - partition_key
-            - partition_key_type
-            - sort_key
-            - sort_key_type
-        - properties:
-            type:
-              const: simple
-            <<: *immutable_partition_key_properties
-          required:
-            - partition_key
-            - partition_key_type
-  properties:
+      - properties:
+          type:
+            const: compound
+          sort_key: *2
+          sort_key_type: *3
+          partition_key: *4
+          partition_key_type: *5
+        required:
+        - partition_key
+        - partition_key_type
+        - sort_key
+        - sort_key_type
+      - properties:
+          type:
+            const: simple
+          partition_key: *4
+          partition_key_type: *5
+        required:
+        - partition_key
+        - partition_key_type
+  properties: &7
     type:
       type: string
       title: Type
       default: simple
-      $md.immutable: true
+      "$md.immutable": true
       enum:
-        - simple
-        - compound
-
+      - simple
+      - compound
 params:
   examples:
-    - __name: Free Tier
-      region: us-west-2
-      capacity:
-        billing_mode: PROVISIONED
-        read_capacity: 25
-        write_capacity: 25
-      primary_index:
-        type: simple
-        partition_key: ID
-        partition_key_type: S
-      ttl:
-        enabled: true
-    - __name: Pay Per Request
-      region: us-west-2
-      capacity:
-        billing_mode: PAY_PER_REQUEST
-      primary_index:
-        type: simple
-        partition_key: ID
-        partition_key_type: S
-    - __name: Compound Index
-      region: us-west-2
-      capacity:
-        billing_mode: PAY_PER_REQUEST
-      primary_index:
-        type: compound
-        partition_key: ID
-        partition_key_type: S
-        sort_key: Date
-        sort_key_type: S
-    - __name: With TTL
-      region: us-west-2
-      capacity:
-        billing_mode: PAY_PER_REQUEST
-      primary_index:
-        type: compound
-        partition_key: ID
-        partition_key_type: S
-        sort_key: Date
-        sort_key_type: S
-    - __name: With Streams
-      region: us-west-2
-      capacity:
-        billing_mode: PAY_PER_REQUEST
-      primary_index:
-        type: compound
-        partition_key: ID
-        partition_key_type: S
-        sort_key: Date
-        sort_key_type: S
-      stream:
-        enabled: true
-        view_type: KEYS_ONLY
-
+  - __name: Free Tier
+    region: us-west-2
+    capacity:
+      billing_mode: PROVISIONED
+      read_capacity: 25
+      write_capacity: 25
+    primary_index:
+      type: simple
+      partition_key: ID
+      partition_key_type: S
+    ttl:
+      enabled: true
+  - __name: Pay Per Request
+    region: us-west-2
+    capacity:
+      billing_mode: PAY_PER_REQUEST
+    primary_index:
+      type: simple
+      partition_key: ID
+      partition_key_type: S
+  - __name: Compound Index
+    region: us-west-2
+    capacity:
+      billing_mode: PAY_PER_REQUEST
+    primary_index:
+      type: compound
+      partition_key: ID
+      partition_key_type: S
+      sort_key: Date
+      sort_key_type: S
+  - __name: With TTL
+    region: us-west-2
+    capacity:
+      billing_mode: PAY_PER_REQUEST
+    primary_index:
+      type: compound
+      partition_key: ID
+      partition_key_type: S
+      sort_key: Date
+      sort_key_type: S
+  - __name: With Streams
+    region: us-west-2
+    capacity:
+      billing_mode: PAY_PER_REQUEST
+    primary_index:
+      type: compound
+      partition_key: ID
+      partition_key_type: S
+      sort_key: Date
+      sort_key_type: S
+    stream:
+      enabled: true
+      view_type: KEYS_ONLY
   required:
-    - region
-    - capacity
-    - primary_index
-    - global_secondary_indexes
-    - stream
-    - ttl
-    - pitr
+  - region
+  - capacity
+  - primary_index
+  - global_secondary_indexes
+  - stream
+  - ttl
+  - pitr
   properties:
     region:
-      $ref: https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
-      $md.immutable: true
+      "$ref": https://raw.githubusercontent.com/massdriver-cloud/artifact-definitions/main/definitions/types/aws-region.json
+      "$md.immutable": true
     capacity:
       type: object
       title: Capacity
       dependencies:
         billing_mode:
           oneOf:
-            - properties:
-                billing_mode:
-                  const: PROVISIONED
-                read_capacity:
-                  type: integer
-                  title: Read Capacity
-                  minimum: 1
-                  maximum: 3000
-                write_capacity:
-                  type: integer
-                  title: Write Capacity
-                  minimum: 1
-                  maximum: 1000
-              required:
-                - read_capacity
-                - write_capacity
-            - properties:
-                billing_mode:
-                  const: PAY_PER_REQUEST
+          - properties:
+              billing_mode:
+                const: PROVISIONED
+              read_capacity:
+                type: integer
+                title: Read Capacity
+                minimum: 1
+                maximum: 3000
+              write_capacity:
+                type: integer
+                title: Write Capacity
+                minimum: 1
+                maximum: 1000
+            required:
+            - read_capacity
+            - write_capacity
+          - properties:
+              billing_mode:
+                const: PAY_PER_REQUEST
       properties:
         billing_mode:
           type: string
           title: Billing Mode
           default: PAY_PER_REQUEST
           enum:
-            - PAY_PER_REQUEST
-            - PROVISIONED
+          - PAY_PER_REQUEST
+          - PROVISIONED
     primary_index:
       type: object
       title: Primary Index
-      <<: *index
+      dependencies: *6
+      properties: *7
     global_secondary_indexes:
       type: array
       title: Global Secondary Indexes
@@ -202,10 +196,10 @@ params:
         type: object
         title: Index
         required:
-          - name
-          - projection_type
-          - read_capacity
-          - write_capacity
+        - name
+        - projection_type
+        - read_capacity
+        - write_capacity
         properties:
           name:
             type: string
@@ -217,9 +211,9 @@ params:
             title: Projection Type
             default: ALL
             enum:
-              - ALL
-              - KEYS_ONLY
-              - INCLUDE
+            - ALL
+            - KEYS_ONLY
+            - INCLUDE
           read_capacity:
             type: integer
             title: Read Capacity
@@ -235,58 +229,59 @@ params:
             dependencies:
               type:
                 oneOf:
-                  - properties:
-                      type:
-                        const: compound
-                      <<:
-                        - *partition_key_properties
-                        - *sort_key_properties
-                    required:
-                      - partition_key
-                      - partition_key_type
-                      - sort_key
-                      - sort_key_type
-                  - properties:
-                      type:
-                        const: simple
-                      <<: *partition_key_properties
-                    required:
-                      - partition_key
-                      - partition_key_type
+                - properties:
+                    type:
+                      const: compound
+                    sort_key: *8
+                    sort_key_type: *9
+                    partition_key: *10
+                    partition_key_type: *11
+                  required:
+                  - partition_key
+                  - partition_key_type
+                  - sort_key
+                  - sort_key_type
+                - properties:
+                    type:
+                      const: simple
+                    partition_key: *10
+                    partition_key_type: *11
+                  required:
+                  - partition_key
+                  - partition_key_type
             properties:
               type:
                 type: string
                 title: Type
                 default: simple
                 enum:
-                  - simple
-                  - compound
-
+                - simple
+                - compound
     stream:
       type: object
       title: DynamoDB Streams
       description: Enable the emission of all changes to the database to a DynamoDB stream which can be consumed by a downstream service.
       required:
-        - enabled
+      - enabled
       dependencies:
         enabled:
           oneOf:
-            - properties:
-                enabled:
-                  const: true
-                view_type:
-                  type: string
-                  default: NEW_IMAGE
-                  enum:
-                    - KEYS_ONLY
-                    - NEW_IMAGE
-                    - OLD_IMAGE
-                    - NEW_AND_OLD_IMAGES
-              required:
-                - view_type
-            - properties:
-                enabled:
-                  const: false
+          - properties:
+              enabled:
+                const: true
+              view_type:
+                type: string
+                default: NEW_IMAGE
+                enum:
+                - KEYS_ONLY
+                - NEW_IMAGE
+                - OLD_IMAGE
+                - NEW_AND_OLD_IMAGES
+            required:
+            - view_type
+          - properties:
+              enabled:
+                const: false
       properties:
         enabled:
           type: boolean
@@ -297,7 +292,7 @@ params:
       title: TTL
       description: Allows you to define a per-item timestamp to determine when an item is no longer needed. Shortly after the date and time of the specified timestamp, DynamoDB deletes the item from your table without consuming any write throughput. This value will be stored as a key called 'TTL'
       required:
-        - enabled
+      - enabled
       properties:
         enabled:
           type: boolean
@@ -308,46 +303,43 @@ params:
       title: Point-in-time Recovery
       description: Enable point-in-time recovery for your DynamoDB table.
       required:
-        - enabled
+      - enabled
       properties:
         enabled:
           type: boolean
           title: Enable
           default: false
-
 connections:
   required:
-    - authentication
+  - authentication
   properties:
     authentication:
-      $ref: massdriver/aws-iam-role
-
+      "$ref": massdriver/aws-iam-role
 artifacts:
   required:
-    - table
+  - table
   properties:
     table:
-      $ref: massdriver/aws-dynamodb-table
+      "$ref": massdriver/aws-dynamodb-table
     stream:
-      $ref: massdriver/aws-dynamodb-stream
-
+      "$ref": massdriver/aws-dynamodb-stream
 ui:
   ui:order:
-    - region
-    - capacity
-    - primary_index
-    - global_secondary_indexes
-    - ttl
-    - stream
-    - pitr
+  - region
+  - capacity
+  - primary_index
+  - global_secondary_indexes
+  - ttl
+  - stream
+  - pitr
   region:
     ui:field: supportedCloudLocationsDropdown
     cloudService: aws
   global_secondary_indexes:
     items:
       ui:order:
-        - name
-        - attributes
-        - read_capacity
-        - write_capacity
-        - projection_type
+      - name
+      - attributes
+      - read_capacity
+      - write_capacity
+      - projection_type
