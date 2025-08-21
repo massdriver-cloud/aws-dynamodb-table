@@ -1,7 +1,6 @@
 resource "massdriver_artifact" "table" {
-  field                = "table"
-  provider_resource_id = aws_dynamodb_table.main.arn
-  name                 = "DynamoDb table: ${local.name}"
+  field    = "table"
+  name     = "DynamoDb table: ${local.name}"
   artifact = jsonencode(
     {
       data = {
