@@ -313,15 +313,15 @@ connections:
   - authentication
   properties:
     authentication:
-      "$ref": massdriver/aws-iam-role
+      "$ref": aws-iam-role
 artifacts:
   required:
   - table
   properties:
     table:
-      "$ref": massdriver/aws-dynamodb-table
+      "$ref": aws-dynamodb-table
     stream:
-      "$ref": massdriver/aws-dynamodb-stream
+      "$ref": aws-dynamodb-stream
 ui:
   ui:order:
   - region
