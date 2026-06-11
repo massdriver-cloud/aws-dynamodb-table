@@ -4,7 +4,7 @@
 variable "authentication" {
   type = object({
     arn         = string
-    external_id = string
+    external_id = optional(string)
   })
 }
 variable "capacity" {
